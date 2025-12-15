@@ -32,11 +32,33 @@ jobs:
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
-    - name: Start Ngrok Tunnel
-      run: Start-Process .\ngrok.exe tcp 3389 -Log=stdout
+- name: Start ngrok
+  shell: cmd
+  run: |
+    start "" ngrok.exe tcp 3389
+
     - name: Check if Ngrok is Running
       run: Get-Process ngrok
     - name: Connect to your RDP 2core-7GB Ram.
-      run: cmd /c NGROK-CHECK.bat
+    - name: Verify ngrok process
+  shell: powershell
+ - name: Verify ngrok process
+  shell: powershell
+  run: |
+    Get-Process ngrok -ErrorAction Stop
+
+      @echo off
+echo ===== NGROK STATUS CHECK =====
+timeout /t 5 >nul
+
+curl http://127.0.0.1:4040/api/tunnels
+
+echo ===== END CHECK =====
+pause
+- name: Verify ngrok process
+  shell: powershell
+  run: |
+    Get-Process ngrok -ErrorAction Stop
+shell: cmd 
     - name: All Done! You can close Tab now! Maximum VM time:6h.
       run: start cmd /c loop.bat
